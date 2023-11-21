@@ -9,117 +9,114 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  uuid      String   @unique
+  uuid      String   @unique @default(uuid())
   email     String   @unique
-  name      String
-  lastName  String
+  firstName String   @map("first_name")
+  lastName  String   @map("last_name")
   username  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   password  String
   type      Role     @default(USER)
   status    Status   @default(ACTIVE)
 
-  UserProgram           UserProgram[]
-  UserProgramTestResult UserProgramTestResult[]
+  programs UserProgram[]
+
+  @@map("users")
 }
 
 model Program {
-  id          Int    @id @default(autoincrement())
-  uuid        String @unique
+  id          Int      @id @default(autoincrement())
+  uuid        String   @unique @default(uuid())
+  name        String
   description String
-  imageUrl    String
+  imageUrl    String   @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  status      Status   @default(ACTIVE)
 
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  status    Status   @default(ACTIVE)
+  users UserProgram[]
+  tests ProgramTest[]
 
-  UserProgram           UserProgram[]
-  ProgramTest           ProgramTest[]
-  UserProgramTestResult UserProgramTestResult[]
+  @@map("programs")
 }
 
 model Test {
   id          Int      @id @default(autoincrement())
-  uuid        String   @unique
+  uuid        String   @unique @default(uuid())
   name        String
   description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
   status      Status   @default(ACTIVE)
   level       Level    @default(BEGINNER)
 
-  ProgramTest           ProgramTest[]
-  TestQuestion          TestQuestion[]
-  UserProgramTestResult UserProgramTestResult[]
+  tests     ProgramTest[]
+  questions TestQuestion[]
+
+  @@map("tests")
 }
 
 model Answer {
-  id             Int              @id @default(autoincrement())
-  text           String
-  QuestionAnswer QuestionAnswer[]
-  Question       Question[]
+  id                     Int              @id @default(autoincrement())
+  uuid                   String           @unique @default(uuid())
+  text                   String
+  optionAnswerQuestions  QuestionAnswer[]
+  correctAnswerQuestions Question[]
+
+  @@map("answers")
 }
 
 model Question {
-  id                Int              @id @default(autoincrement())
-  text              String
-  correct_answer    Answer           @relation(fields: [correct_answer_id], references: [id])
-  correct_answer_id Int
-  TestQuestion      TestQuestion[]
-  QuestionAnswer    QuestionAnswer[]
+  id              Int              @id @default(autoincrement())
+  uuid            String           @unique @default(uuid())
+  text            String
+  correctAnswer   Answer           @relation(fields: [correctAnswerId], references: [id])
+  correctAnswerId Int              @map("correct_answer_id")
+  tests           TestQuestion[]
+  answers         QuestionAnswer[]
+
+  @@map("questions")
 }
 
 model UserProgram {
-  user       User    @relation(fields: [user_id], references: [id])
-  user_id    Int
-  program    Program @relation(fields: [program_id], references: [id])
-  program_id Int
+  userId    Int     @map("user_id")
+  programId Int     @map("program_id")
+  user      User    @relation(fields: [userId], references: [id])
+  program   Program @relation(fields: [programId], references: [id])
 
-  @@id([user_id, program_id])
+  @@id([userId, programId])
+  @@map("user_programs")
 }
 
 model ProgramTest {
-  program    Program @relation(fields: [program_id], references: [id])
-  program_id Int
-  test       Test    @relation(fields: [test_id], references: [id])
-  test_id    Int
+  programId Int     @map("program_id")
+  testId    Int     @map("test_id")
+  test      Test    @relation(fields: [testId], references: [id])
+  program   Program @relation(fields: [programId], references: [id])
 
-  @@id([program_id, test_id])
+  @@id([programId, testId])
+  @@map("program_tests")
 }
 
 model TestQuestion {
-  test        Test     @relation(fields: [test_id], references: [id])
-  test_id     Int
-  question    Question @relation(fields: [question_id], references: [id])
-  question_id Int
+  testId     Int      @map("test_id")
+  questionId Int      @map("question_id")
+  test       Test     @relation(fields: [testId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id])
 
-  @@id([test_id, question_id])
+  @@id([testId, questionId])
+  @@map("test_questions")
 }
 
 model QuestionAnswer {
-  question    Question @relation(fields: [question_id], references: [id])
-  question_id Int
-  answer      Answer   @relation(fields: [answer_id], references: [id])
-  answer_id   Int
+  questionId Int      @map("question_id")
+  answerId   Int      @map("answer_id")
+  question   Question @relation(fields: [questionId], references: [id])
+  answer     Answer   @relation(fields: [answerId], references: [id])
 
-  @@id([question_id, answer_id])
-}
-
-model UserProgramTestResult {
-  user    User @relation(fields: [user_id], references: [id])
-  user_id Int
-
-  program    Program @relation(fields: [program_id], references: [id])
-  program_id Int
-
-  test    Test @relation(fields: [test_id], references: [id])
-  test_id Int
-
-  score Int
-
-  @@id([user_id, program_id, test_id])
+  @@id([questionId, answerId])
+  @@map("question_answers")
 }
 
 enum Role {
