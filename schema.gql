@@ -25,8 +25,44 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Test {
+  id: Float
+  uuid: String
+  name: String
+  status: Status
+  level: Level
+  description: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+enum Status {
+  ACTIVE
+  DELETED
+}
+
+enum Level {
+  BEGINNER
+  MEDIUM
+  ADVANCED
+}
+
+type Question {
+  id: Float
+  uuid: String
+  text: String
+}
+
+type Answer {
+  id: Float
+  uuid: String
+  text: String
+}
+
 type Query {
   user(where: UserWhereUniqueInput!): User
+  test(where: TestWhereUniqueInput!): Test
+  question(where: QuestionWhereUniqueInput!): Question
 }
 
 input UserWhereUniqueInput {
@@ -35,8 +71,22 @@ input UserWhereUniqueInput {
   email: String
 }
 
+input TestWhereUniqueInput {
+  id: Float
+  uuid: String
+  name: String
+}
+
+input QuestionWhereUniqueInput {
+  id: Float
+  text: String
+}
+
 type Mutation {
   createUser(data: UserCreateInput!): User!
+  createTest(data: TestCreateInput!): Test!
+  createQuestion(data: QuestionCreateInput!): Question!
+  createAnswer(data: AnswerCreateInput!): Answer!
 }
 
 input UserCreateInput {
@@ -46,4 +96,62 @@ input UserCreateInput {
   firstName: String!
   lastName: String!
   username: String!
+}
+
+input TestCreateInput {
+  status: Status!
+  level: Level!
+  name: String!
+  description: String!
+  questions: TestQuestionCreateNestedManyWithoutTestInput!
+}
+
+input TestQuestionCreateNestedManyWithoutTestInput {
+  create: [TestQuestionCreateWithoutTestInput!]!
+}
+
+input TestQuestionCreateWithoutTestInput {
+  question: QuestionCreateWithoutTestsInput!
+}
+
+input QuestionCreateWithoutTestsInput {
+  text: String!
+  correctAnswer: AnswerCreateNestedOneWithoutCorrectAnswerQuestionsInput!
+  answers: QuestionAnswerCreateNestedManyWithoutQuestionInput!
+}
+
+input AnswerCreateNestedOneWithoutCorrectAnswerQuestionsInput {
+  create: AnswerCreateInput!
+}
+
+input AnswerCreateInput {
+  text: String!
+}
+
+input QuestionAnswerCreateNestedManyWithoutQuestionInput {
+  create: [QuestionAnswerCreateWithoutQuestionInput!]
+  connect: [QuestionAnswerWhereUniqueInput!]
+}
+
+input QuestionAnswerCreateWithoutQuestionInput {
+  answer: AnswerCreateNestedOneWithoutOptionAnswerQuestionsInput!
+}
+
+input AnswerCreateNestedOneWithoutOptionAnswerQuestionsInput {
+  create: AnswerCreateInput
+  connect: AnswerWhereUniqueInput
+}
+
+input AnswerWhereUniqueInput {
+  id: Float
+  uuid: String!
+}
+
+input QuestionAnswerWhereUniqueInput {
+  uuid: String!
+}
+
+input QuestionCreateInput {
+  text: String!
+  correctAnswer: AnswerCreateNestedOneWithoutCorrectAnswerQuestionsInput!
 }

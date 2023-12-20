@@ -20,7 +20,8 @@ model User {
   type      Role     @default(USER)
   status    Status   @default(ACTIVE)
 
-  programs UserProgram[]
+  programs     UserProgram[]
+  testAttempts UserTest[]
 
   @@map("users")
 }
@@ -51,8 +52,9 @@ model Test {
   status      Status   @default(ACTIVE)
   level       Level    @default(BEGINNER)
 
-  tests     ProgramTest[]
-  questions TestQuestion[]
+  programs     ProgramTest[]
+  questions    TestQuestion[]
+  userAttempts UserTest[]
 
   @@map("tests")
 }
@@ -110,13 +112,36 @@ model TestQuestion {
 }
 
 model QuestionAnswer {
-  questionId Int      @map("question_id")
-  answerId   Int      @map("answer_id")
-  question   Question @relation(fields: [questionId], references: [id])
-  answer     Answer   @relation(fields: [answerId], references: [id])
+  id          Int                      @id @default(autoincrement())
+  uuid        String                   @unique @default(uuid())
+  questionId  Int                      @map("question_id")
+  answerId    Int                      @map("answer_id")
+  question    Question                 @relation(fields: [questionId], references: [id])
+  answer      Answer                   @relation(fields: [answerId], references: [id])
+  userAttempt UserTestQuestionAnswer[]
 
-  @@id([questionId, answerId])
   @@map("question_answers")
+}
+
+model UserTestQuestionAnswer {
+  questionAnswerId Int @map("question_answer_id")
+  userTestId       Int @map("user_test_id")
+
+  questionAnswer QuestionAnswer @relation(fields: [questionAnswerId], references: [id])
+  userTest       UserTest       @relation(fields: [userTestId], references: [id])
+
+  @@id([questionAnswerId, userTestId])
+  @@map("user_test_question_answers")
+}
+
+model UserTest {
+  id              Int                      @id @default(autoincrement())
+  uuid            String                   @unique @default(uuid())
+  userId          Int                      @map("user_id")
+  testId          Int                      @map("test_id")
+  test            Test                     @relation(fields: [testId], references: [id])
+  user            User                     @relation(fields: [userId], references: [id])
+  questionAnswers UserTestQuestionAnswer[]
 }
 
 enum Role {
