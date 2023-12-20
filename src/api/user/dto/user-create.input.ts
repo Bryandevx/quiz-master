@@ -12,7 +12,7 @@ export class UserCreateInput {
   @Field(() => String)
   email: string;
 
-  @MinLength(10)
+  @MinLength(5)
   @MaxLength(60)
   @Field(() => String)
   password: string;
