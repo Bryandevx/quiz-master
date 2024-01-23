@@ -38,4 +38,11 @@ export class UserService {
       select,
     });
   }
+
+  public async findUserRole({ where }: UserArgs) {
+    const user = await this.prismaService.user.findUnique({
+      where,
+    });
+    return user ? user.type : null;
+  }
 }

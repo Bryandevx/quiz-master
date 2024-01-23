@@ -12,8 +12,11 @@ import { AnswerModule } from './api/answer/answer.module';
 
 import { PrismaModule } from './shared/datasource/prisma.module';
 
+import { AuthModule } from './api/auth/auth.module';
+
 @Module({
   imports: [
+    AuthModule,
     PrismaModule,
     ConfigModule,
     UserModule,

@@ -4,7 +4,6 @@ interface UserPrismaSelect {
   email?: boolean;
   type?: boolean;
   username?: boolean;
-  name?: boolean;
   lastName?: boolean;
   createdAt?: boolean;
   updatedAt?: boolean;

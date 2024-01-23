@@ -59,6 +59,12 @@ type Answer {
   text: String
 }
 
+type LoginOutput {
+  access_token: String!
+  expiresAt: DateTime!
+  user: User!
+}
+
 type Query {
   user(where: UserWhereUniqueInput!): User
   test(where: TestWhereUniqueInput!): Test
@@ -83,10 +89,25 @@ input QuestionWhereUniqueInput {
 }
 
 type Mutation {
+  login(data: LoginUserInput!): LoginOutput!
+  signup(data: SignUpInput!): User!
   createUser(data: UserCreateInput!): User!
   createTest(data: TestCreateInput!): Test!
   createQuestion(data: QuestionCreateInput!): Question!
   createAnswer(data: AnswerCreateInput!): Answer!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input SignUpInput {
+  email: String!
+  password: String!
+  firstName: String!
+  lastName: String!
+  username: String!
 }
 
 input UserCreateInput {
