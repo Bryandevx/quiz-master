@@ -8,19 +8,44 @@ import { TestArgs, TestCreateInput } from './dto';
 
 import { PrismaService } from 'src/shared/datasource/prisma.service';
 
+import { FilterService } from 'src/shared/modules/filter.service';
+
 @Injectable()
 export class TestService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly filterService: FilterService,
+  ) {}
 
-  public async findOne(
-    { where }: TestArgs,
+  public async findAll(
+    args: TestArgs,
     { select }: TestSelect,
-  ): Promise<Test> {
-    return this.prismaService.test.findUnique({
-      where,
+  ): Promise<Test[]> {
+    const { search, ...filters } = args || {};
+
+    const tests = await this.prismaService.test.findMany({
+      skip: filters.skip,
+      cursor: filters.cursor,
+      take: filters.take,
+      orderBy: filters.orderBy,
       select,
+      where: {
+        ...args.where,
+        AND: this.filterService.getTestSearchFilter(search),
+      },
     });
+    return tests;
   }
+
+  // public async findOne(
+  //   { where }: TestArgs,
+  //   { select }: TestSelect,
+  // ): Promise<Test> {
+  //   return this.prismaService.test.findUnique({
+  //     where,
+  //     select,
+  //   });
+  // }
 
   public async create(
     { questions, ...data }: TestCreateInput,

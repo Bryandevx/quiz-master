@@ -67,7 +67,7 @@ type LoginOutput {
 
 type Query {
   user(where: UserWhereUniqueInput!): User
-  test(where: TestWhereUniqueInput!): Test
+  tests(skip: Int, take: Int, cursor: TestWhereUniqueInput, orderBy: TestOrderByInput, where: TestWhereInput, search: SearchInput): [Test!]!
   question(where: QuestionWhereUniqueInput!): Question
 }
 
@@ -81,6 +81,33 @@ input TestWhereUniqueInput {
   id: Float
   uuid: String
   name: String
+}
+
+input TestOrderByInput {
+  id: OrderByArg
+  uuid: OrderByArg
+  name: OrderByArg
+  description: OrderByArg
+  createdAt: OrderByArg
+  updatedAt: OrderByArg
+}
+
+enum OrderByArg {
+  ASC
+  DESC
+}
+
+input TestWhereInput {
+  id: Int
+  uuid: String
+  name: String
+  description: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input SearchInput {
+  value: String!
 }
 
 input QuestionWhereUniqueInput {

@@ -15,12 +15,20 @@ import {
 export class TestResolver {
   constructor(private readonly testService: TestService) {}
 
-  @Query(() => Test, { nullable: true })
-  public async test(
+  // @Query(() => Test, { nullable: true })
+  // public async test(
+  //   @Args() args: TestArgs,
+  //   @GraphQLFields() { fields }: IGraphQLFields<TestSelect>,
+  // ): Promise<Test | null> {
+  //   return this.testService.findOne(args, fields);
+  // }
+
+  @Query(() => [Test])
+  public async tests(
     @Args() args: TestArgs,
     @GraphQLFields() { fields }: IGraphQLFields<TestSelect>,
-  ): Promise<Test | null> {
-    return this.testService.findOne(args, fields);
+  ): Promise<Test[]> {
+    return this.testService.findAll(args, fields);
   }
 
   @Mutation(() => Test)
